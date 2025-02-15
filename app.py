@@ -4,6 +4,7 @@ import os
 from openai import OpenAI
 from dotenv import load_dotenv
 import base64
+import json
 
 load_dotenv()
 
@@ -58,41 +59,69 @@ def analyze_image():
                         {
                             "type": "text",
                             "text": f"""
-                            I need the following information from the image:
-                            
-                            Name of product
-                            Name of brand
-                            Weight (you should make a guess based on the image and the name of product if not provided)
-                            Country photo was taken in (hardcoded to UK)
-                            Additional context provided by user: {context}
-                            Reason for scanning: {reason}
-                            Barcode (if provided): {barcode}
-
-                            Return the information in a JSON format. Do not provide any other text except for the JSON object. 
+                            Analyze this product image and return a JSON object with the following fields:
+                            {{
+                                "name_of_product": "product name",
+                                "name_of_brand": "brand name",
+                                "weight": "weight or estimated weight",
+                                "country": "UK",
+                                "additional_context": "{context}",
+                                "scan_reason": "{reason}",
+                                "barcode": "{barcode}"
+                            }}
+                            Return only the JSON object, no additional text.
                             """,
                         },
                         {
                             "type": "image_url",
-                            "image_url": {
-                                "url": f"data:image/jpeg;base64,{image_data}"
-                            },
+                            "image_url": {"url": f"data:image/jpeg;base64,{image_data}"},
                         },
                     ],
                 }
             ],
-            max_tokens=500,
+            max_tokens=300,
+            temperature=0.3,
         )
 
-        print("HERE")
-        print(response.choices[0].message.content)
-        print("HERE DONE")
+        # Get the response content
+        analysis_content = response.choices[0].message.content.strip()
+        print("Raw API Response:", analysis_content)  # Debug log
 
-        return jsonify(
-            {"success": True, "analysis": response.choices[0].message.content}
-        )
+        try:
+            # Try to parse as JSON
+            if not analysis_content:
+                return (
+                    jsonify({"success": False, "error": "Empty response from AI"}),
+                    500,
+                )
+
+            # If response isn't already JSON, try to extract JSON portion
+            if not analysis_content.startswith("{"):
+                # Look for JSON-like content between curly braces
+                start = analysis_content.find("{")
+                end = analysis_content.rfind("}") + 1
+                if start >= 0 and end > 0:
+                    analysis_content = analysis_content[start:end]
+
+            parsed_json = json.loads(analysis_content)
+            return jsonify({"success": True, "analysis": parsed_json})
+        except json.JSONDecodeError as e:
+            print(f"JSON Parsing Error: {e}")
+            print(f"Problematic content: {analysis_content}")
+            # Return a formatted error response
+            return (
+                jsonify(
+                    {
+                        "success": False,
+                        "error": "Invalid JSON response from AI",
+                        "raw_response": analysis_content,
+                    }
+                ),
+                500,
+            )
 
     except Exception as e:
-        print(f"Error analyzing image: {e}")  # Debug log
+        print(f"Error analyzing image: {e}")
         return jsonify({"success": False, "error": str(e)}), 500
 
 

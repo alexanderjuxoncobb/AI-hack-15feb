@@ -6,22 +6,33 @@ import {
   Box,
   Divider,
 } from "@mui/material";
-import { analyzeProductImage } from "../services/geminiService";
 import { useImage } from "../hooks/useImage";
 
 const ResultsPage = () => {
   const { searchHistory } = useImage();
 
-  const handleImageAnalysis = async (imageFile) => {
+  const renderAnalysis = (analysis) => {
     try {
-      const result = await analyzeProductImage(
-        imageFile,
-        "This is a grocery product from a UK supermarket"
+      const parsedAnalysis =
+        typeof analysis === "string" ? JSON.parse(analysis) : analysis;
+      return (
+        <Box>
+          <Typography variant="body1">
+            Product: {parsedAnalysis.name_of_product}
+          </Typography>
+          <Typography variant="body1">
+            Brand: {parsedAnalysis.name_of_brand}
+          </Typography>
+          <Typography variant="body1">
+            Weight: {parsedAnalysis.weight}
+          </Typography>
+          <Typography variant="body1">
+            Country: {parsedAnalysis.country}
+          </Typography>
+        </Box>
       );
-      console.log(result);
-      // Handle the result as needed
     } catch (error) {
-      console.error("Error:", error);
+      return <Typography color="error">Error parsing analysis data</Typography>;
     }
   };
 
@@ -78,14 +89,11 @@ const ResultsPage = () => {
                   </Box>
                   <Divider sx={{ my: 2 }} />
                   <Typography variant="h6" gutterBottom>
-                    ESG Information
+                    Product Analysis
                   </Typography>
-                  <Typography color="text.secondary">
-                    Carbon Footprint: {item.results.carbonFootprint}
-                  </Typography>
-                  <Typography color="text.secondary">
-                    ESG Score: {item.results.esgScore}
-                  </Typography>
+                  {item.results &&
+                    item.results.analysis &&
+                    renderAnalysis(item.results.analysis)}
                 </Grid>
               </Grid>
             </Paper>

@@ -8,20 +8,39 @@ import {
   Divider,
 } from "@mui/material";
 import { useImage } from "../context/ImageContext";
-import { analyzeProductImage } from "../services/geminiService";
 
 const ResultsPage = () => {
   const { searchHistory } = useImage();
 
-  const handleImageAnalysis = async (imageFile) => {
+  const renderAnalysis = (analysis) => {
     try {
-      const result = await analyzeProductImage(
-        imageFile,
-        "This is a grocery product from a UK supermarket"
+      // If analysis is already an object, use it directly
+      const data =
+        typeof analysis === "string" ? JSON.parse(analysis) : analysis;
+
+      return (
+        <>
+          <Typography color="text.secondary">
+            Product: {data.name_of_product || "N/A"}
+          </Typography>
+          <Typography color="text.secondary">
+            Brand: {data.name_of_brand || "N/A"}
+          </Typography>
+          <Typography color="text.secondary">
+            Weight: {data.weight || "N/A"}
+          </Typography>
+          <Typography color="text.secondary">
+            Country: {data.country || "UK"}
+          </Typography>
+        </>
       );
-      console.log(result);
-    } catch (error) {
-      console.error("Error:", error);
+    } catch (err) {
+      console.error("Error rendering analysis:", err);
+      return (
+        <Typography color="error">
+          Error displaying product information
+        </Typography>
+      );
     }
   };
 
@@ -55,6 +74,15 @@ const ResultsPage = () => {
                   )}
                 </Grid>
                 <Grid item xs={12} md={8}>
+                  <Typography variant="h6" gutterBottom>
+                    Product Information
+                  </Typography>
+                  {item.results.analysis && (
+                    <Box sx={{ mb: 2 }}>
+                      {renderAnalysis(item.results.analysis)}
+                    </Box>
+                  )}
+                  <Divider sx={{ my: 2 }} />
                   <Typography variant="h6" gutterBottom>
                     Scan Details
                   </Typography>

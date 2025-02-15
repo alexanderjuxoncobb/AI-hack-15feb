@@ -76,7 +76,7 @@ const SearchPage = ({ onSearch }) => {
         throw new Error(data.error);
       }
 
-      const mockResult = {
+      const result = {
         id: Date.now(),
         timestamp: new Date().toISOString(),
         imageUrl: previewUrl,
@@ -85,16 +85,14 @@ const SearchPage = ({ onSearch }) => {
         reason: reason === "Other" ? otherReason : reason,
         results: {
           analysis: data.analysis,
-          carbonFootprint: "Pending API integration",
-          esgScore: "Pending API integration",
         },
       };
 
       if (onSearch) {
-        onSearch(mockResult);
+        onSearch(result);
       }
 
-      addToHistory(mockResult);
+      addToHistory(result);
       navigate("/results");
     } catch (error) {
       console.error("Error analyzing image:", error);
