@@ -19,7 +19,7 @@ const Navbar = () => {
             color: "inherit",
           }}
         >
-          ESG Scanner
+          Coffee Monster 2000
         </Typography>
         <Box>
           <Button
