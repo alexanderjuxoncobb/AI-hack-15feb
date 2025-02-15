@@ -11,7 +11,7 @@ import {
   Collapse,
 } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import { useImage } from "../context/ImageContext";
+import { useImage } from "../hooks/useImage";
 
 const SearchPage = ({ onSearch }) => {
   const navigate = useNavigate();

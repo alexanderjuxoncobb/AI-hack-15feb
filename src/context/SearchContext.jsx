@@ -1,9 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useImage } from '../context/ImageContext';
+import { useImage } from "../context/ImageContext";
 import {
-  Paper, Typography, Button, TextField,
-  Box, Container, Collapse,
+  Paper,
+  Typography,
+  Button,
+  TextField,
+  Box,
+  Container,
+  Collapse,
 } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 

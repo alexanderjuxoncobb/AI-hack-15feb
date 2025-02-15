@@ -7,7 +7,7 @@ import {
   Divider,
 } from "@mui/material";
 import { analyzeProductImage } from "../services/geminiService";
-import { useImage } from "../context/ImageContext";
+import { useImage } from "../hooks/useImage";
 
 const ResultsPage = () => {
   const { searchHistory } = useImage();

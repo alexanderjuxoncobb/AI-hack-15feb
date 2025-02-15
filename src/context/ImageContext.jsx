@@ -1,4 +1,5 @@
-import { createContext, useState, useContext } from "react";
+import { createContext, useState } from "react";
+import PropTypes from "prop-types";
 
 export const ImageContext = createContext();
 
@@ -19,4 +20,6 @@ export const ImageProvider = ({ children }) => {
   );
 };
 
-export const useImage = () => useContext(ImageContext);
+ImageProvider.propTypes = {
+  children: PropTypes.node.isRequired,
+};
