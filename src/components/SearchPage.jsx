@@ -7,11 +7,11 @@ import {
   TextField,
   Box,
   Container,
-  ButtonGroup,
   Collapse,
 } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { useImage } from "../hooks/useImage";
+import PropTypes from "prop-types";
 
 const SearchPage = ({ onSearch }) => {
   const navigate = useNavigate();
@@ -43,21 +43,62 @@ const SearchPage = ({ onSearch }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const mockResult = {
-      id: Date.now(),
-      timestamp: new Date().toISOString(),
-      imageUrl: previewUrl,
-      barcode,
-      context,
-      reason: reason === "Other" ? otherReason : reason,
-      results: {
-        carbonFootprint: "Pending API integration",
-        esgScore: "Pending API integration",
-      },
-    };
+    if (!image) {
+      console.error("No image selected");
+      return;
+    }
 
-    addToHistory(mockResult);
-    navigate("/results");
+    try {
+      const reader = new FileReader();
+
+      const base64Image = await new Promise((resolve, reject) => {
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(image);
+      });
+
+      const response = await fetch("http://localhost:5001/api/analyze-image", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          image: base64Image,
+          barcode: barcode,
+          context: context,
+          reason: reason === "Other" ? otherReason : reason,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error);
+      }
+
+      const mockResult = {
+        id: Date.now(),
+        timestamp: new Date().toISOString(),
+        imageUrl: previewUrl,
+        barcode,
+        context,
+        reason: reason === "Other" ? otherReason : reason,
+        results: {
+          analysis: data.analysis,
+          carbonFootprint: "Pending API integration",
+          esgScore: "Pending API integration",
+        },
+      };
+
+      if (onSearch) {
+        onSearch(mockResult);
+      }
+
+      addToHistory(mockResult);
+      navigate("/results");
+    } catch (error) {
+      console.error("Error analyzing image:", error);
+    }
   };
 
   return (
@@ -170,6 +211,10 @@ const SearchPage = ({ onSearch }) => {
       </Paper>
     </Container>
   );
+};
+
+SearchPage.propTypes = {
+  onSearch: PropTypes.func,
 };
 
 export default SearchPage;
