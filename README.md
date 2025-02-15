@@ -1,8 +1,1 @@
-# React + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+An App I built for the AI Engine hack which takes a photo of any consumer product (e.g. coffee, packet of crisips, a t-shirt) and provides relevant information regarding the product, the company and any specific considerations for the user. The main categories the app considers are product health risks, carbon footprint, company controversies, user dietary restrictions and additional user provided context. The app will then give a list of all the images scanned alongside a summary of the above categories. 
