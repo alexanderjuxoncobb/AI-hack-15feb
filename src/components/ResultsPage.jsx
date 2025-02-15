@@ -1,4 +1,3 @@
-// ResultsPage.jsx
 import {
   Container,
   Paper,
@@ -7,8 +6,8 @@ import {
   Box,
   Divider,
 } from "@mui/material";
-import { useImage } from "../context/ImageContext";
 import { analyzeProductImage } from "../services/geminiService";
+import { useImage } from "../context/ImageContext";
 
 const ResultsPage = () => {
   const { searchHistory } = useImage();
@@ -20,6 +19,7 @@ const ResultsPage = () => {
         "This is a grocery product from a UK supermarket"
       );
       console.log(result);
+      // Handle the result as needed
     } catch (error) {
       console.error("Error:", error);
     }
@@ -68,7 +68,7 @@ const ResultsPage = () => {
                       </Typography>
                     )}
                     <Typography color="text.secondary">
-                      Reason: {item.reason}
+                      {item.reason ? `Reason: ${item.reason}` : ""}
                     </Typography>
                     {item.context && (
                       <Typography color="text.secondary">

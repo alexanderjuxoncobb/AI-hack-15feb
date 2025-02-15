@@ -1,9 +1,10 @@
+import { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@mui/material";
-import SearchPage from "./pages/SearchPage";
-import ResultsPage from "./pages/ResultsPage";
+import SearchPage from "./components/SearchPage";
+import ResultsPage from "./components/ResultsPage";
 import Navbar from "./components/Navbar";
-import { SearchProvider } from "./context/SearchContext";
+import { ImageProvider } from "./context/ImageContext";
 
 const theme = createTheme({
   palette: {
@@ -77,50 +78,41 @@ const theme = createTheme({
         },
       },
     },
-    MuiAccordion: {
-      styleOverrides: {
-        root: {
-          border: "1px solid #e0e0e0",
-          borderRadius: "8px !important",
-          marginBottom: "8px",
-          "&:before": {
-            display: "none",
-          },
-          "&.Mui-expanded": {
-            margin: "0 0 8px 0",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-          },
-        },
-      },
-    },
-    MuiAccordionSummary: {
-      styleOverrides: {
-        root: {
-          borderRadius: "8px",
-          "&.Mui-expanded": {
-            borderBottom: "1px solid #e0e0e0",
-          },
-        },
-      },
-    },
   },
 });
 
 function App() {
+  const [searchHistory, setSearchHistory] = useState([]);
+
+  const addToHistory = (searchResult) => {
+    setSearchHistory((prev) => [searchResult, ...prev]);
+  };
+
   return (
-    <ThemeProvider theme={theme}>
-      <SearchProvider>
+    <ImageProvider>
+      <ThemeProvider theme={theme}>
         <Router>
-          <div className="app-container">
+          <div
+            className="min-h-screen"
+            style={{ backgroundColor: theme.palette.background.default }}
+          >
             <Navbar />
-            <Routes>
-              <Route path="/" element={<SearchPage />} />
-              <Route path="/results" element={<ResultsPage />} />
-            </Routes>
+            <main className="container mx-auto px-4 py-8">
+              <Routes>
+                <Route
+                  path="/"
+                  element={<SearchPage onSearch={addToHistory} />}
+                />
+                <Route
+                  path="/results"
+                  element={<ResultsPage searchHistory={searchHistory} />}
+                />
+              </Routes>
+            </main>
           </div>
         </Router>
-      </SearchProvider>
-    </ThemeProvider>
+      </ThemeProvider>
+    </ImageProvider>
   );
 }
 

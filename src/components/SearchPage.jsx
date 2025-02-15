@@ -1,7 +1,5 @@
-// SearchPage.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useImage } from "../context/ImageContext";
 import {
   Paper,
   Typography,
@@ -9,11 +7,13 @@ import {
   TextField,
   Box,
   Container,
+  ButtonGroup,
   Collapse,
 } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import { useImage } from "../context/ImageContext";
 
-const SearchPage = () => {
+const SearchPage = ({ onSearch }) => {
   const navigate = useNavigate();
   const { addToHistory } = useImage();
   const [image, setImage] = useState(null);
@@ -28,13 +28,7 @@ const SearchPage = () => {
     const file = e.target.files[0];
     if (file) {
       setImage(file);
-      // Convert to base64 for persistent storage
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result;
-        setPreviewUrl(base64String);
-      };
-      reader.readAsDataURL(file);
+      setPreviewUrl(URL.createObjectURL(file));
     }
   };
 
@@ -46,25 +40,25 @@ const SearchPage = () => {
     }
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const mockResult = {
-    id: Date.now(),
-    timestamp: new Date().toISOString(),
-    imageUrl: previewUrl, // THIS WAS image: previewUrl before
-    barcode,
-    context,
-    reason: reason === "Other" ? otherReason : reason,
-    results: {
-      carbonFootprint: "Pending API integration",
-      esgScore: "Pending API integration",
-    },
+    const mockResult = {
+      id: Date.now(),
+      timestamp: new Date().toISOString(),
+      imageUrl: previewUrl,
+      barcode,
+      context,
+      reason: reason === "Other" ? otherReason : reason,
+      results: {
+        carbonFootprint: "Pending API integration",
+        esgScore: "Pending API integration",
+      },
+    };
+
+    addToHistory(mockResult);
+    navigate("/results");
   };
-
-  addToHistory(mockResult);
-  navigate("/results");
-};
 
   return (
     <Container maxWidth="md">
